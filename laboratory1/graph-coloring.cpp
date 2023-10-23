@@ -18,6 +18,7 @@ void everyNodeGetsAColor(void *solver, int node, int countOfColors)
         ipasir_add(solver, node * 100 + i);
     }
 
+    // std::cout << "Finish Clause" << std::endl;
     ipasir_add(solver, 0);
 }
 
@@ -29,20 +30,20 @@ void atMostOneColorPerNode(void *solver, int node, int countOfColors)
     {
         for (int j = i + 1; j < countOfColors; j++)
         {
+            // std::cout << "Node " << node << ", Color " << -(node * 100 + i) << std::endl;
+            // std::cout << "Node " << node << ", Color " <<  -(node * 100 + j) << std::endl;
             ipasir_add(solver, -(node * 100 + i));
             ipasir_add(solver, -(node * 100 + j));
             ipasir_add(solver, 0);
         }
     }
-
-    ipasir_add(solver, 0);
 }
 
 void adjacentNodesHaveDifferentColors(void *solver, int firstNode, int secondNode, int countOfColors)
 {
-    /* std::cout << "adjacentNodesHaveDifferentColors" << std::endl;
-    std::cout << "First Node: " << firstNode << std::endl;
-    std::cout << "Second Node: " << secondNode << std::endl; */
+    // std::cout << "adjacentNodesHaveDifferentColors" << std::endl;
+    // std::cout << "First Node: " << firstNode << std::endl;
+    // std::cout << "Second Node: " << secondNode << std::endl;
     for (int i = 0; i < countOfColors; i++)
     {
         // std::cout << "First Node: " << -(firstNode * 100 + i) << std::endl;
@@ -51,6 +52,7 @@ void adjacentNodesHaveDifferentColors(void *solver, int firstNode, int secondNod
         // std::cout << "Second Node: " << -(secondNode * 100 + i) << std::endl;
         ipasir_add(solver, -(secondNode * 100 + i));
 
+        // std::cout << "Finish Clause" << std::endl;
         ipasir_add(solver, 0);
     }
 }
@@ -92,7 +94,7 @@ int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
-        std::cout << "Please enter only the path to your dicmas graph file!" << std::endl;
+        std::cout << "Please enter only the path to your dimacs graph file!" << std::endl;
         return 0;
     }
 
@@ -150,7 +152,8 @@ int main(int argc, char *argv[])
         {
             int variableCodeForNode = i + 1;
             everyNodeGetsAColor(solver, variableCodeForNode, countOfColors);
-            // atMostOneColorPerNode(solver, variableCodeForNode, countOfColors);
+            atMostOneColorPerNode(solver, variableCodeForNode, countOfColors);
+
             for (int j = 0; j < countOfVertices; j++)
             {
                 if (adjacencyMatrix[i][j] == 1)
@@ -182,8 +185,8 @@ int main(int argc, char *argv[])
     std::cout << "Now printing the color code for every node" << std::endl;
     for(int i = 1; i <= countOfVertices; i++) {
         int colorCode = 0;
-        for(int j = 1; j <= solutionCountOfColors; j++) {
-            // std::cout << "Node " << i << ", Color " << colorCode << ", Value " << ipasir_val(solver, i * 100 + j) << "." << std::endl;
+        for(int j = 0; j < solutionCountOfColors; j++) {
+            // std::cout << "Node " << i << ", Color " << j << ", Value " << ipasir_val(solver, i * 100 + j) << "." << std::endl;
             int value = ipasir_val(solver, i * 100 + j);
             if(value > 0) {
                 colorCode = j;
@@ -191,9 +194,9 @@ int main(int argc, char *argv[])
             }
         }
 
-        std::cout << getColor(colorCode) << "Node " << i << " has Color " << colorCode << "!" << "\033[0m " << std::endl;
+        std::cout << getColor(colorCode) << "Node " << i << " has Color " << colorCode + 1 << "!" << "\033[0m " << std::endl;
     }
 
-
+    ipasir_release(solver);
     return 0;
 }
