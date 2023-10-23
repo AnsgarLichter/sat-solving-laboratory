@@ -107,10 +107,12 @@ int main(int argc, char *argv[])
     std::cout << "File parsed successfully!" << std::endl;
     std::cout << "Start creating the clauses for " << countOfVertices << " Vertices and " << countOfEdges << " Edges!" << std::endl;
     bool satisifable = false;
+    int solutionCountOfColors = 0;
+    void *solver;
     for (int countOfColors = 2; satisifable == false; countOfColors++)
     {
         std::cout << "Count of Colors: " << countOfColors << std::endl;
-        void *solver = ipasir_init();
+        solver = ipasir_init();
         for (int i = 0; i < countOfVertices; i++)
         {
             int variableCodeForNode = i + 1;
@@ -130,6 +132,7 @@ int main(int argc, char *argv[])
         if (result == 10)
         {
             std::cout << "SAT: Lösung gefunden für " << countOfColors << " Farben!" << std::endl;
+            solutionCountOfColors = countOfColors;
             satisifable = true;
         }
         else if (result == 20)
@@ -143,7 +146,20 @@ int main(int argc, char *argv[])
         }
     }
 
-    //TODO: Print Colors Per Node
+    std::cout << "Now printing the color code for every node" << std::endl;
+    for(int i = 1; i <= countOfVertices; i++) {
+        int colorCode = 0;
+        for(int j = 1; j < solutionCountOfColors; j++) {
+            bool hasColor = ipasir_val(solver, i * 100 + j);
+            if(hasColor) {
+                colorCode = j + 1;
+                break;
+            }
+        }
+
+        std::cout << "Node " << i << " has Color " << colorCode << "!" << std::endl;
+    }
+
 
     return 0;
 }
