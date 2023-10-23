@@ -55,6 +55,39 @@ void adjacentNodesHaveDifferentColors(void *solver, int firstNode, int secondNod
     }
 }
 
+std::string getColor(int number) {
+    // Define an array of ANSI escape codes for 20 different colors
+    const std::vector<std::string> colors = {
+        "\033[30m",   // Black
+        "\033[31m",   // Red
+        "\033[32m",   // Green
+        "\033[33m",   // Yellow
+        "\033[34m",   // Blue
+        "\033[35m",   // Magenta
+        "\033[36m",   // Cyan
+        "\033[37m",   // White
+        "\033[90m",   // Light Black
+        "\033[91m",   // Light Red
+        "\033[92m",   // Light Green
+        "\033[93m",   // Light Yellow
+        "\033[94m",   // Light Blue
+        "\033[95m",   // Light Magenta
+        "\033[96m",   // Light Cyan
+        "\033[97m",   // Light White
+        "\033[40m",   // Background Black
+        "\033[41m",   // Background Red
+        "\033[42m",   // Background Green
+        "\033[43m",   // Background Yellow
+        "\033[44m",   // Background Blue
+    };
+
+    // Calculate the index in the colors array based on the number
+    int colorIndex = (number - 1) % colors.size();
+
+    // Return the corresponding color
+    return colors[colorIndex];
+}
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -158,7 +191,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        std::cout << "Node " << i << " has Color " << colorCode << "!" << std::endl;
+        std::cout << getColor(colorCode) << "Node " << i << " has Color " << colorCode << "!" << "\033[0m " << std::endl;
     }
 
 
