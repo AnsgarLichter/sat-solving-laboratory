@@ -149,10 +149,11 @@ int main(int argc, char *argv[])
     std::cout << "Now printing the color code for every node" << std::endl;
     for(int i = 1; i <= countOfVertices; i++) {
         int colorCode = 0;
-        for(int j = 1; j < solutionCountOfColors; j++) {
-            bool hasColor = ipasir_val(solver, i * 100 + j);
-            if(hasColor) {
-                colorCode = j + 1;
+        for(int j = 1; j <= solutionCountOfColors; j++) {
+            // std::cout << "Node " << i << ", Color " << colorCode << ", Value " << ipasir_val(solver, i * 100 + j) << "." << std::endl;
+            int value = ipasir_val(solver, i * 100 + j);
+            if(value > 0) {
+                colorCode = j;
                 break;
             }
         }
