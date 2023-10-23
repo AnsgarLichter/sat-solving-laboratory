@@ -15,6 +15,9 @@
 *.exe
 *.out
 *.app
+*
+!*.*
+!*/
 
 # CMake build directory
 /CMakeFiles/
@@ -62,3 +65,7 @@ autom4te.cache/
 
 # IDE
 .vscode
+
+# Solvers
+.cadical
+cadical
