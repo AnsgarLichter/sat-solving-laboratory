@@ -64,7 +64,7 @@ autom4te.cache/
 *.gch
 
 # IDE
-.vscode
+.vscode/
 
 # Solvers
 .cadical
