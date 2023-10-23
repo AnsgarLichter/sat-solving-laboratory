@@ -8,6 +8,53 @@
 
 using namespace std;
 
+void everyNodeGetsAColor(void *solver, int node, int countOfColors)
+{   
+    // std::cout << "everyNodeGetsAColor" << std::endl;
+    // std::cout << "Node " << node << std::endl;
+    for (int i = 0; i < countOfColors; i++)
+    {
+        // std::cout << "Node " << node << ", Color " << i << ", add literal " << node * 100 + i << std::endl;
+        ipasir_add(solver, node * 100 + i);
+    }
+
+    ipasir_add(solver, 0);
+}
+
+void atMostOneColorPerNode(void *solver, int node, int countOfColors)
+{   
+    // std::cout << "atMostOneColorPerNode" << std::endl;
+    // std::cout << "Node " << node << std::endl;
+    for (int i = 0; i < countOfColors - 1; i++)
+    {
+        for (int j = i + 1; j < countOfColors; j++)
+        {
+            ipasir_add(solver, -(node * 100 + i));
+            ipasir_add(solver, -(node * 100 + j));
+            ipasir_add(solver, 0);
+        }
+    }
+
+    ipasir_add(solver, 0);
+}
+
+void adjacentNodesHaveDifferentColors(void *solver, int firstNode, int secondNode, int countOfColors)
+{
+    /* std::cout << "adjacentNodesHaveDifferentColors" << std::endl;
+    std::cout << "First Node: " << firstNode << std::endl;
+    std::cout << "Second Node: " << secondNode << std::endl; */
+    for (int i = 0; i < countOfColors; i++)
+    {
+        // std::cout << "First Node: " << -(firstNode * 100 + i) << std::endl;
+        ipasir_add(solver, -(firstNode * 100 + i));
+
+        // std::cout << "Second Node: " << -(secondNode * 100 + i) << std::endl;
+        ipasir_add(solver, -(secondNode * 100 + i));
+
+        ipasir_add(solver, 0);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -23,6 +70,8 @@ int main(int argc, char *argv[])
         std::cout << "Failed to open the file at the path '" << pathToDimacsGraph << "'!" << std::endl;
         return 1;
     }
+
+    std::cout << "Start parsing the input file ..." << std::endl;
 
     std::string line;
     int countOfVertices = 0;
@@ -55,53 +104,46 @@ int main(int argc, char *argv[])
 
     file.close();
 
-    for (int i = 0; i < countOfVertices; ++i)
+    std::cout << "File parsed successfully!" << std::endl;
+    std::cout << "Start creating the clauses for " << countOfVertices << " Vertices and " << countOfEdges << " Edges!" << std::endl;
+    bool satisifable = false;
+    for (int countOfColors = 2; satisifable == false; countOfColors++)
     {
-        for (int j = 0; j < countOfVertices; ++j)
+        std::cout << "Count of Colors: " << countOfColors << std::endl;
+        void *solver = ipasir_init();
+        for (int i = 0; i < countOfVertices; i++)
         {
-            std::cout << adjacencyMatrix[i][j] << " ";
+            int variableCodeForNode = i + 1;
+            everyNodeGetsAColor(solver, variableCodeForNode, countOfColors);
+            // atMostOneColorPerNode(solver, variableCodeForNode, countOfColors);
+            for (int j = 0; j < countOfVertices; j++)
+            {
+                if (adjacencyMatrix[i][j] == 1)
+                {
+                    adjacentNodesHaveDifferentColors(solver, variableCodeForNode, j + 1, countOfColors);
+                }
+            }
         }
-        std::cout << std::endl;
+
+        std::cout << "All clauses created. Calling the solver ..." << std::endl;
+        int result = ipasir_solve(solver);
+        if (result == 10)
+        {
+            std::cout << "SAT: Lösung gefunden für " << countOfColors << " Farben!" << std::endl;
+            satisifable = true;
+        }
+        else if (result == 20)
+        {
+            std::cout << "UNSAT: Keine Lösung gefunden für " << countOfColors << " Farben!" << std::endl;
+        }
+        else
+        {
+            std::cout << "CaDiCal-Fehler: " << result << std::endl;
+            return 1;
+        }
     }
 
-    // TODO: Create formulas
-    void *solver = ipasir_init();
-
-    // TODO: Call SAT Sovler
-
-    // TODO: Print Result
+    //TODO: Print Colors Per Node
 
     return 0;
-}
-
-void adjacentNodesHaveDifferentColors(void *solver, int colorCodeFirstNode, int colorCodeSecondNode)
-{
-    ipasir_add(solver, colorCodeFirstNode * -1);
-    ipasir_add(solver, colorCodeSecondNode * -1);
-    ipasir_add(solver, 0);
-}
-
-void everyNodeGetsAColor(void *solver, const std::vector<int> &colorCodesOfNode)
-{
-    int length = sizeof(colorCodesOfNode) / sizeof(int);
-    for (const int &colorCode : colorCodesOfNode)
-    {
-        ipasir_add(solver, colorCode);
-    }
-    ipasir_add(solver, 0);
-}
-
-void atMostOneColorPerNode(void *solver, const std::vector<int> &colorCodesOfNode)
-{
-    for (size_t i = 0; i < colorCodesOfNode.size(); ++i)
-    {
-        for (size_t j = i + 1; j < colorCodesOfNode.size(); ++j)
-        {
-            ipasir_add(solver, -colorCodesOfNode[i]);
-            ipasir_add(solver, -colorCodesOfNode[j]);
-            ipasir_add(solver, 0);
-        }
-    }
-
-    ipasir_add(solver, 0);
 }
