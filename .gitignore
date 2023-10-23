@@ -1,0 +1,61 @@
+# Compiled Object files
+*.o
+*.lo
+*.slo
+*.la
+*.lai
+*.class
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Executables
+*.exe
+*.out
+*.app
+
+# CMake build directory
+/CMakeFiles/
+/CMakeCache.txt
+/CMakeScripts/
+/CMakeScripts/*
+
+# Generated Makefiles
+Makefile
+CMakeLists.txt.user
+
+# C++ IDEs
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# Sublime Text
+.sublime-workspace
+
+# Text editor backup files
+*~
+*.swp
+
+# Debugging files
+*.db
+
+# Code::Blocks
+.cbp
+
+# Eclipse
+.settings/
+
+# Xcode
+.xcodeproj/
+
+# Code::Blocks, KDevelop
+.kdev4
+
+# Autotools output
+autom4te.cache/
+
+# g++ generated files
+*.gch
